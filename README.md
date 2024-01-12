@@ -1,9 +1,10 @@
 ## ET: Legacy Events Discord bot
-A helper tool for cup management.
+A helper tool for tournament management.
 
 ### Bot keywords
 ```
-!<placeholder>
+!cup help
+!cup h
 ```
 
 ### Run bot
@@ -19,3 +20,4 @@ Required files:
 
 ### Notes 
 1. https://thriveread.com/golang-google-sheets-and-spreadsheet-api
+2. https://discord.com/developers/docs/intro

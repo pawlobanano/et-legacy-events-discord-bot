@@ -36,13 +36,13 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 	config := &Environemnt{
 		DISCORD_BOT_API_KEY:          os.Getenv("DISCORD_BOT_API_KEY"),
 		GOOGLE_SHEETS_SPREADSHEET_ID: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
-		JwtConfig:                    loadKey(),
+		JwtConfig:                    loadGoogleKeyJSON(),
 	}
 
 	return config, nil
 }
 
-func loadKey() *jwt.Config {
+func loadGoogleKeyJSON() *jwt.Config {
 	creds, err := os.ReadFile("./key.json")
 	if err != nil {
 		log.Error("Unable to read key.json file.", err)

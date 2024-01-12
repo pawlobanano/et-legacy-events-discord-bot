@@ -8,9 +8,12 @@ require (
 	google.golang.org/api v0.156.0
 )
 
+require github.com/gorilla/websocket v1.4.2 // indirect
+
 require (
 	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/bwmarrin/discordgo v0.27.1
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

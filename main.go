@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/pawlobanano/et-legacy-events-discord-bot/config"
 	"github.com/pawlobanano/et-legacy-events-discord-bot/discord"
 	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
 )
 
-var log = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+var (
+	log = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	wg  sync.WaitGroup
+)
 
 func main() {
 	config, err := config.LoadConfig(log, ".env")
@@ -21,10 +26,28 @@ func main() {
 		return
 	}
 
-	discord.Run(log, config)
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		discord.Run(log, config)
+	}()
 
 	googlesheets.Run(log, config, config.JwtConfig.Client(context.Background()))
 
-	fmt.Printf("Server is listening on port %s...\n", ":8080")
-	http.ListenAndServe(":8080", nil)
+	go func() {
+		log.Info("Server is listening on port :8080")
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			log.Error("HTTP server error: ", err)
+		}
+	}()
+
+	<-interrupt
+	log.Info("Received interrupt signal. Shutting down...")
+
+	wg.Wait()
+	log.Info("Shutdown complete.")
 }
