@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 
 	"os"
@@ -10,47 +9,60 @@ import (
 
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2/google"
+	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/sheets/v4"
 )
 
+var log *slog.Logger
+
 // LoadConfig loads the configuration from the .env file.
-func LoadConfig(slog *slog.Logger, envFilePath string) (*Environemnt, error) {
+func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 	err := Load(envFilePath)
 	if err != nil {
-		slog.Error("Loading .env file.", err)
+		log.Error("Loading .env file.", err)
 		return nil, err
 	}
 
+	if len(os.Getenv("DISCORD_BOT_API_KEY")) == 0 {
+		log.Error("Environment variable DISCORD_BOT_API_KEY has not been set.")
+		os.Exit(1)
+	}
+
+	if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID")) == 0 {
+		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ID has not been set.")
+		os.Exit(1)
+	}
+
+	config := &Environemnt{
+		DISCORD_BOT_API_KEY:          os.Getenv("DISCORD_BOT_API_KEY"),
+		GOOGLE_SHEETS_SPREADSHEET_ID: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
+		JwtConfig:                    loadKey(),
+	}
+
+	return config, nil
+}
+
+func loadKey() *jwt.Config {
 	creds, err := os.ReadFile("./key.json")
 	if err != nil {
-		log.Fatalf("Unable to read credentials file: %v", err)
+		log.Error("Unable to read key.json file.", err)
+		os.Exit(1)
 	}
 
 	jwtConfig, err := google.JWTConfigFromJSON(creds, sheets.SpreadsheetsScope)
 	if err != nil {
-		log.Fatalf("Unable to create JWT config: %v", err)
+		log.Error("Unable to create JWT config.", err)
+		os.Exit(1)
 	}
 
-	// DISCORD_BOT_API_KEY := os.Getenv("DISCORD_BOT_API_KEY")
-
-	// if len(DISCORD_BOT_API_KEY) != 32 {
-	// 	slog.Error(fmt.Sprintf("%s %d", "DISCORD_BOT_API_KEY must be equal to 32 characters. But was", len(DISCORD_BOT_API_KEY)))
-	// }
-
-	config := &Environemnt{
-		// DISCORD_BOT_API_KEY: DISCORD_BOT_API_KEY,
-		JwtConfig:     jwtConfig,
-		SpreadsheetID: os.Getenv("GOOGLE_SPREADSHEET_ID"),
-	}
-
-	return config, nil
+	return jwtConfig
 }
 
 // Load loads the environment variables from the .env file.
 func Load(envFile string) error { // Solution to differentiate .env file path for unit or benchmark tests; source: https://github.com/joho/godotenv/issues/126#issuecomment-1474645022
 	err := godotenv.Load(dir(envFile))
 	if err != nil {
-		slog.Error(err.Error())
+		log.Error(err.Error())
 		return err
 	}
 	return nil

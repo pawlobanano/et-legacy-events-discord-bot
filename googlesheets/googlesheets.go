@@ -42,7 +42,7 @@ func AdaptReadDataHandler(handler func(config *config.Environemnt, w http.Respon
 }
 
 func ReadiData(config *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(config.SpreadsheetID, readRange).Context(r.Context()).Do()
+	resp, err := sheetsService.Spreadsheets.Values.Get(config.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func ReadiData(config *config.Environemnt, w http.ResponseWriter, r *http.Reques
 }
 
 func ReadData(config *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(config.SpreadsheetID, readRange).Context(r.Context()).Do()
+	resp, err := sheetsService.Spreadsheets.Values.Get(config.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

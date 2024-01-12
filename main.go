@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/pawlobanano/et-legacy-events-discord-bot/config"
+	"github.com/pawlobanano/et-legacy-events-discord-bot/discord"
 	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
 )
 
@@ -19,6 +20,8 @@ func main() {
 		log.Error("Loading config failed.", err)
 		return
 	}
+
+	discord.Run(log, config)
 
 	googlesheets.Run(log, config, config.JwtConfig.Client(context.Background()))
 
