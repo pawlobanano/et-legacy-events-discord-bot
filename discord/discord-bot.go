@@ -11,10 +11,10 @@ import (
 	"github.com/pawlobanano/et-legacy-events-discord-bot/config"
 )
 
-func Run(log *slog.Logger, config *config.Environemnt) {
-	bot, err := discordgo.New("Bot " + config.DISCORD_BOT_API_KEY)
+func Run(log *slog.Logger, envConfig *config.Environemnt) {
+	bot, err := discordgo.New("Bot " + envConfig.DISCORD_BOT_API_KEY)
 	if err != nil {
-		log.Error("Error instantiating Discord bot.")
+		log.Error("Error instantiating bot.")
 		os.Exit(1)
 	}
 
@@ -23,8 +23,8 @@ func Run(log *slog.Logger, config *config.Environemnt) {
 			return
 		}
 
-		if strings.HasPrefix(mess.Content, "!cup help") || strings.HasPrefix(mess.Content, "!cup h") {
-			sess.ChannelMessageSend(mess.ChannelID, "`!cup help` command example triggered response.")
+		if strings.HasPrefix(mess.Content, "!cupbot status") || strings.HasPrefix(mess.Content, "!cupbot s") {
+			sess.ChannelMessageSend(mess.ChannelID, "Last bot's heart beat: `"+bot.LastHeartbeatAck.UTC().String()+"`")
 			return
 		}
 	})

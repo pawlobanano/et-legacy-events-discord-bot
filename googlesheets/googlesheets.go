@@ -16,12 +16,12 @@ const (
 )
 
 var (
-	configCopy    *config.Environemnt
+	envConfigCopy *config.Environemnt
 	sheetsService *sheets.Service
 )
 
-func Run(log *slog.Logger, config *config.Environemnt, client *http.Client) {
-	configCopy = config
+func Run(log *slog.Logger, envConfig *config.Environemnt, client *http.Client) {
+	envConfigCopy = envConfig
 	var err error
 	sheetsService, err = sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
@@ -31,18 +31,18 @@ func Run(log *slog.Logger, config *config.Environemnt, client *http.Client) {
 	http.HandleFunc("/read", AdaptReadDataHandler(ReadData))
 }
 
-func AdaptReadDataHandler(handler func(config *config.Environemnt, w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+func AdaptReadDataHandler(handler func(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		config := func(configCopy *config.Environemnt) *config.Environemnt {
-			return configCopy
-		}(configCopy)
+		envConfig := func(envConfigCopy *config.Environemnt) *config.Environemnt {
+			return envConfigCopy
+		}(envConfigCopy)
 
-		handler(config, w, r)
+		handler(envConfig, w, r)
 	}
 }
 
-func ReadiData(config *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(config.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
+func ReadiData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	resp, err := sheetsService.Spreadsheets.Values.Get(envConfig.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -53,8 +53,8 @@ func ReadiData(config *config.Environemnt, w http.ResponseWriter, r *http.Reques
 	w.Write(data)
 }
 
-func ReadData(config *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(config.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
+func ReadData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	resp, err := sheetsService.Spreadsheets.Values.Get(envConfig.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

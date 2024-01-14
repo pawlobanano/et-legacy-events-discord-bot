@@ -8,7 +8,7 @@ require (
 	google.golang.org/api v0.156.0
 )
 
-require github.com/gorilla/websocket v1.4.2 // indirect
+require github.com/gorilla/websocket v1.5.1 // indirect
 
 require (
 	cloud.google.com/go/compute v1.23.3 // indirect

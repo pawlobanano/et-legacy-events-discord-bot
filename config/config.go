@@ -13,7 +13,10 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-var log *slog.Logger
+var (
+	log        *slog.Logger
+	LoggingLvl = new(slog.LevelVar) // Info by default.
+)
 
 // LoadConfig loads the configuration from the .env file.
 func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
@@ -28,6 +31,11 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 		os.Exit(1)
 	}
 
+	if len(os.Getenv("ENVIRONMENT")) == 0 {
+		log.Error("Environment variable ENVIRONMENT has not been set.")
+		os.Exit(1)
+	}
+
 	if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID")) == 0 {
 		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ID has not been set.")
 		os.Exit(1)
@@ -35,6 +43,7 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 
 	config := &Environemnt{
 		DISCORD_BOT_API_KEY:          os.Getenv("DISCORD_BOT_API_KEY"),
+		ENVIRONMENT:                  os.Getenv("ENVIRONMENT"),
 		GOOGLE_SHEETS_SPREADSHEET_ID: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
 		JwtConfig:                    loadGoogleKeyJSON(),
 	}

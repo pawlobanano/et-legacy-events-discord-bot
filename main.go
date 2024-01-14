@@ -14,16 +14,20 @@ import (
 	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
 )
 
-var (
-	log = slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	wg  sync.WaitGroup
-)
+var wg sync.WaitGroup
 
 func main() {
-	config, err := config.LoadConfig(log, ".env")
+	log := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: config.LoggingLvl}))
+	slog.SetDefault(log)
+
+	envConfig, err := config.LoadConfig(log, ".env")
 	if err != nil {
-		log.Error("Loading config failed.", err)
+		log.Error("Loading config failed.", slog.String("error", err.Error()))
 		return
+	}
+
+	if envConfig.ENVIRONMENT == "local" {
+		config.LoggingLvl.Set(slog.LevelDebug)
 	}
 
 	interrupt := make(chan os.Signal, 1)
@@ -32,10 +36,10 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		discord.Run(log, config)
+		discord.Run(log, envConfig)
 	}()
 
-	googlesheets.Run(log, config, config.JwtConfig.Client(context.Background()))
+	googlesheets.Run(log, envConfig, envConfig.JwtConfig.Client(context.Background()))
 
 	go func() {
 		log.Info("Server is listening on port :8080")
