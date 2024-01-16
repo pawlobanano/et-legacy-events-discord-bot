@@ -1,11 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"log/slog"
 
 	"os"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2/google"
@@ -51,8 +49,9 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 	return envConfig, nil
 }
 
+// loadGoogleKeyJSON utilize key.json file and returns Google's JWT Config.
 func loadGoogleKeyJSON() *jwt.Config {
-	creds, err := os.ReadFile("./key.json")
+	creds, err := os.ReadFile("key.json")
 	if err != nil {
 		log.Error("Unable to read the key.json file.", err)
 		os.Exit(1)
@@ -68,37 +67,11 @@ func loadGoogleKeyJSON() *jwt.Config {
 }
 
 // Load loads the environment variables from the .env file.
-func Load(envFile string) error { // Solution to differentiate .env file path for unit or benchmark tests; source: https://github.com/joho/godotenv/issues/126#issuecomment-1474645022
-	err := godotenv.Load(dir(envFile))
+func Load(envFile string) error {
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Error("Loading the godotenv library failed.", err)
 		return err
 	}
 	return nil
-}
-
-// dir returns the absolute path of the given environment file (envFile) in the Go module's
-// root directory. It searches for the 'go.mod' file from the current working directory upwards
-// and appends the envFile to the directory containing 'go.mod'.
-// It panics if it fails to find the 'go.mod' file.
-func dir(envFile string) string {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		panic(fmt.Errorf("returning the rooted path name corresponding to the current directory failed"))
-	}
-
-	for {
-		goModPath := filepath.Join(currentDir, "go.mod")
-		if _, err := os.Stat(goModPath); err == nil {
-			break
-		}
-
-		parent := filepath.Dir(currentDir)
-		if parent == currentDir {
-			panic(fmt.Errorf("go.mod file not found"))
-		}
-		currentDir = parent
-	}
-
-	return filepath.Join(currentDir, envFile)
 }
