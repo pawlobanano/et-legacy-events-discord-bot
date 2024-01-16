@@ -9,3 +9,6 @@ type Environemnt struct {
 	GOOGLE_SHEETS_SPREADSHEET_ID string
 	JwtConfig                    *jwt.Config
 }
+
+// Response is a type of HTTP response body.
+type Response [][]string

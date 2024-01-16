@@ -22,7 +22,7 @@ var (
 func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 	err := Load(envFilePath)
 	if err != nil {
-		log.Error("Loading .env file.", err)
+		log.Error("Loading the .env file failed.", err)
 		return nil, err
 	}
 
@@ -41,20 +41,20 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 		os.Exit(1)
 	}
 
-	config := &Environemnt{
+	envConfig := &Environemnt{
 		DISCORD_BOT_API_KEY:          os.Getenv("DISCORD_BOT_API_KEY"),
 		ENVIRONMENT:                  os.Getenv("ENVIRONMENT"),
 		GOOGLE_SHEETS_SPREADSHEET_ID: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
 		JwtConfig:                    loadGoogleKeyJSON(),
 	}
 
-	return config, nil
+	return envConfig, nil
 }
 
 func loadGoogleKeyJSON() *jwt.Config {
 	creds, err := os.ReadFile("./key.json")
 	if err != nil {
-		log.Error("Unable to read key.json file.", err)
+		log.Error("Unable to read the key.json file.", err)
 		os.Exit(1)
 	}
 
@@ -71,7 +71,7 @@ func loadGoogleKeyJSON() *jwt.Config {
 func Load(envFile string) error { // Solution to differentiate .env file path for unit or benchmark tests; source: https://github.com/joho/godotenv/issues/126#issuecomment-1474645022
 	err := godotenv.Load(dir(envFile))
 	if err != nil {
-		log.Error(err.Error())
+		log.Error("Loading the godotenv library failed.", err)
 		return err
 	}
 	return nil
@@ -84,7 +84,7 @@ func Load(envFile string) error { // Solution to differentiate .env file path fo
 func dir(envFile string) string {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("returning the rooted path name corresponding to the current directory failed"))
 	}
 
 	for {
@@ -95,7 +95,7 @@ func dir(envFile string) string {
 
 		parent := filepath.Dir(currentDir)
 		if parent == currentDir {
-			panic(fmt.Errorf("go.mod not found"))
+			panic(fmt.Errorf("go.mod file not found"))
 		}
 		currentDir = parent
 	}

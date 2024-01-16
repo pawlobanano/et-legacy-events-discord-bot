@@ -12,37 +12,41 @@ import (
 )
 
 const (
-	readRange = "DraftCup#2!A:H"
+	TournamentName      = "DraftCup"
+	TournamentEdition   = "2"
+	allTeamsLineupRange = "!A:H"
+	allTeamsLineupQuery = TournamentName + "#" + TournamentEdition + allTeamsLineupRange
 )
 
 var (
-	envConfigCopy *config.Environemnt
+	cfgCopy       *config.Environemnt
 	sheetsService *sheets.Service
 )
 
-func Run(log *slog.Logger, envConfig *config.Environemnt, client *http.Client) {
-	envConfigCopy = envConfig
+func Run(log *slog.Logger, cfg *config.Environemnt, client *http.Client) {
+	cfgCopy = cfg
 	var err error
 	sheetsService, err = sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		log.Error("Unable to create Google Sheets service: ", err)
+		log.Error("Unable to create Google Sheets service.", err)
 	}
 
 	http.HandleFunc("/read", AdaptReadDataHandler(ReadData))
+	http.HandleFunc("/team", AdaptReadDataHandler(getAllTeams))
 }
 
-func AdaptReadDataHandler(handler func(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+func AdaptReadDataHandler(handler func(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		envConfig := func(envConfigCopy *config.Environemnt) *config.Environemnt {
-			return envConfigCopy
-		}(envConfigCopy)
+		cfg := func(cfgCopy *config.Environemnt) *config.Environemnt {
+			return cfgCopy
+		}(cfgCopy)
 
-		handler(envConfig, w, r)
+		handler(cfg, w, r)
 	}
 }
 
-func ReadiData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(envConfig.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
+func ReadiData(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -53,8 +57,8 @@ func ReadiData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Req
 	w.Write(data)
 }
 
-func ReadData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(envConfig.GOOGLE_SHEETS_SPREADSHEET_ID, readRange).Context(r.Context()).Do()
+func ReadData(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).Context(r.Context()).Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -67,6 +71,18 @@ func ReadData(envConfig *config.Environemnt, w http.ResponseWriter, r *http.Requ
 	}
 
 	data, _ := json.Marshal(response)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func getAllTeams(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).MajorDimension("COLUMNS").Do()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, _ := json.Marshal(resp.Values)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
