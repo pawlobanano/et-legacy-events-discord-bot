@@ -24,29 +24,42 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 		return nil, err
 	}
 
-	if len(os.Getenv("DISCORD_BOT_API_KEY")) == 0 {
-		log.Error("Environment variable DISCORD_BOT_API_KEY has not been set.")
-		os.Exit(1)
-	}
-
-	if len(os.Getenv("ENVIRONMENT")) == 0 {
-		log.Error("Environment variable ENVIRONMENT has not been set.")
-		os.Exit(1)
-	}
-
-	if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID")) == 0 {
-		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ID has not been set.")
+	if err := validateEnvironmentVariables(log); err != nil {
 		os.Exit(1)
 	}
 
 	envConfig := &Environemnt{
-		DISCORD_BOT_API_KEY:          os.Getenv("DISCORD_BOT_API_KEY"),
-		ENVIRONMENT:                  os.Getenv("ENVIRONMENT"),
-		GOOGLE_SHEETS_SPREADSHEET_ID: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
-		JwtConfig:                    loadGoogleKeyJSON(),
+		DISCORD_BOT_API_KEY:                          os.Getenv("DISCORD_BOT_API_KEY"),
+		ENVIRONMENT:                                  os.Getenv("ENVIRONMENT"),
+		GOOGLE_SHEETS_SPREADSHEET_ID:                 os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
+		GOOGLE_SHEETS_SPREADSHEET_TAB:                os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TAB"),
+		GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE"),
+		JwtConfig: loadGoogleKeyJSON(),
 	}
 
 	return envConfig, nil
+}
+
+func validateEnvironmentVariables(log *slog.Logger) error {
+	var err error
+	if len(os.Getenv("DISCORD_BOT_API_KEY")) == 0 {
+		log.Error("Environment variable DISCORD_BOT_API_KEY has not been set.")
+		return err
+	} else if len(os.Getenv("ENVIRONMENT")) == 0 {
+		log.Error("Environment variable ENVIRONMENT has not been set.")
+		return err
+	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID")) == 0 {
+		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ID has not been set.")
+		return err
+	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TAB")) == 0 {
+		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_TAB has not been set.")
+		return err
+	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE")) == 0 {
+		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE has not been set.")
+		return err
+	}
+
+	return nil
 }
 
 // loadGoogleKeyJSON utilize key.json file and returns Google's JWT Config.
@@ -68,7 +81,7 @@ func loadGoogleKeyJSON() *jwt.Config {
 
 // Load loads the environment variables from the .env file.
 func Load(envFile string) error {
-	err := godotenv.Load(".env")
+	err := godotenv.Load(envFile)
 	if err != nil {
 		log.Error("Loading the godotenv library failed.", err)
 		return err

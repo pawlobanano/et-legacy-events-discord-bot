@@ -21,7 +21,7 @@ func main() {
 
 	cfg, err := config.LoadConfig(log, ".env")
 	if err != nil {
-		log.LogAttrs(context.Background(), slog.LevelError, "Loading the config package failed.", slog.String("msg", err.Error())) // As an optimize example.
+		log.LogAttrs(context.Background(), slog.LevelError, "Loading the config package failed.", slog.String("msg", err.Error())) // As an optimized example.
 		return
 	}
 

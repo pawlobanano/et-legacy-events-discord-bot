@@ -12,7 +12,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/pawlobanano/et-legacy-events-discord-bot/config"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
 )
 
 func Run(log *slog.Logger, cfg *config.Environemnt) {
@@ -38,7 +37,7 @@ func Run(log *slog.Logger, cfg *config.Environemnt) {
 		}
 
 		if strings.EqualFold(m.Content, "!cup teams") || strings.EqualFold(m.Content, "!cup t") {
-			getAllTeams(log, s, m)
+			getAllTeamLineups(log, cfg, s, m)
 			return
 		}
 
@@ -63,7 +62,7 @@ func Run(log *slog.Logger, cfg *config.Environemnt) {
 	<-sigCh
 }
 
-func getAllTeams(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCreate) {
+func getAllTeamLineups(log *slog.Logger, cfg *config.Environemnt, s *discordgo.Session, m *discordgo.MessageCreate) {
 	channel, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
 		log.Error(err.Error())
@@ -71,7 +70,7 @@ func getAllTeams(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCre
 
 	resp, err := http.DefaultClient.Get("http://localhost:8080/team")
 	if err != nil {
-		log.Error("GET all-teams-lineup failed.", err.Error(), slog.Int("HTTP status code", http.StatusInternalServerError))
+		log.Error("GET /team failed.", err.Error(), slog.Int("HTTP status code", http.StatusInternalServerError))
 		return
 	}
 	defer resp.Body.Close()
@@ -94,7 +93,7 @@ func getAllTeams(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCre
 					multilineStr.Append("**" + value + "**")
 					continue
 				}
-				if j == 1 {
+				if j == 1 && value != "" {
 					multilineStr.Append("- **" + value + "**")
 					continue
 				}
@@ -110,7 +109,7 @@ func getAllTeams(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCre
 		})
 
 		s.ChannelMessageSendEmbed(channel.ID, &discordgo.MessageEmbed{
-			Title:  googlesheets.TournamentName + "#" + googlesheets.TournamentEdition + " | Team lineups",
+			Title:  cfg.GOOGLE_SHEETS_SPREADSHEET_TAB + " | Team lineups",
 			Fields: fields,
 		})
 	} else {

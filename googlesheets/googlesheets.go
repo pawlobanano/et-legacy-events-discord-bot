@@ -11,13 +11,6 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-const (
-	TournamentName      = "DraftCup"
-	TournamentEdition   = "2"
-	allTeamsLineupRange = "!A:H"
-	allTeamsLineupQuery = TournamentName + "#" + TournamentEdition + allTeamsLineupRange
-)
-
 var (
 	cfgCopy       *config.Environemnt
 	sheetsService *sheets.Service
@@ -31,8 +24,7 @@ func Run(log *slog.Logger, cfg *config.Environemnt, client *http.Client) {
 		log.Error("Unable to create Google Sheets service.", err)
 	}
 
-	http.HandleFunc("/read", AdaptReadDataHandler(ReadData))
-	http.HandleFunc("/team", AdaptReadDataHandler(getAllTeams))
+	http.HandleFunc("/team", AdaptReadDataHandler(getAllTeamLineups))
 }
 
 func AdaptReadDataHandler(handler func(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
@@ -45,38 +37,9 @@ func AdaptReadDataHandler(handler func(cfg *config.Environemnt, w http.ResponseW
 	}
 }
 
-func ReadiData(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).Context(r.Context()).Do()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	data, _ := json.Marshal(resp.Values)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
-}
-
-func ReadData(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).Context(r.Context()).Do()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	response := struct {
-		Data [][]interface{} `json:"data"`
-	}{
-		Data: resp.Values,
-	}
-
-	data, _ := json.Marshal(response)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
-}
-
-func getAllTeams(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
-	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, allTeamsLineupQuery).MajorDimension("COLUMNS").Do()
+func getAllTeamLineups(cfg *config.Environemnt, w http.ResponseWriter, r *http.Request) {
+	query := cfg.GOOGLE_SHEETS_SPREADSHEET_TAB + cfg.GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE
+	resp, err := sheetsService.Spreadsheets.Values.Get(cfg.GOOGLE_SHEETS_SPREADSHEET_ID, query).MajorDimension("COLUMNS").Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
