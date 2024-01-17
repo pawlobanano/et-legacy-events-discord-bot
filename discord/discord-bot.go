@@ -89,15 +89,21 @@ func getAllTeamLineups(log *slog.Logger, cfg *config.Environemnt, s *discordgo.S
 		multilineStr := NewMultilineString()
 		for _, row := range result {
 			for j, value := range row {
-				if j == 0 {
-					multilineStr.Append("**" + value + "**")
-					continue
+				parts := strings.Split(value, " ")
+				if len(parts) == 2 {
+					countryCode := parts[1]
+					if j == 0 {
+						multilineStr.Append("**" + value + "**") // Team
+						continue
+					} else if j == 1 && value != "" {
+						multilineStr.Append("- :flag_" + countryCode + ": **" + parts[0] + "**") // Captain
+						continue
+					}
+					multilineStr.Append("- :flag_" + countryCode + ": " + parts[0]) // Standard player
+				} else {
+					log.Info("Player name input string does not contain the ALPHA-2 country code.", "String: ", value)
+					multilineStr.Append("- " + value) // Standard player
 				}
-				if j == 1 && value != "" {
-					multilineStr.Append("- **" + value + "**")
-					continue
-				}
-				multilineStr.Append("- " + value)
 			}
 			multilineStr.Append("")
 		}
