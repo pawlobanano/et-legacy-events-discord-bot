@@ -86,14 +86,14 @@ func getAllTeamLineups(log *slog.Logger, cfg *config.Environemnt, s *discordgo.S
 			log.Error("Can not unmarshal JSON.", err)
 		}
 
-		multilineStr := NewMultilineString()
+		multilineStr := NewMultilineString("# " + cfg.GOOGLE_SHEETS_SPREADSHEET_TAB + " | Team lineups")
 		for _, row := range result {
 			for j, value := range row {
 				parts := strings.Split(value, " ")
 				if len(parts) == 2 {
 					countryCode := parts[1]
 					if j == 0 {
-						multilineStr.Append("**" + value + "**") // Team
+						multilineStr.Append("## " + value) // Team
 						continue
 					} else if j == 1 && value != "" {
 						multilineStr.Append("- :flag_" + countryCode + ": **" + parts[0] + "**") // Captain
@@ -101,23 +101,15 @@ func getAllTeamLineups(log *slog.Logger, cfg *config.Environemnt, s *discordgo.S
 					}
 					multilineStr.Append("- :flag_" + countryCode + ": " + parts[0]) // Standard player
 				} else {
-					log.Info("Player name input string does not contain the ALPHA-2 country code.", "String: ", value)
-					multilineStr.Append("- " + value) // Standard player
+					log.Info("Wrong player name input string.", "Value", value)
+					multilineStr.Append("- " + parts[0]) // Standard player
 				}
 			}
 			multilineStr.Append("")
 		}
 		multilineStr.Append("`!cup help` _to check available commands_")
 
-		var fields []*discordgo.MessageEmbedField
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Value: multilineStr.Format(),
-		})
-
-		s.ChannelMessageSendEmbed(channel.ID, &discordgo.MessageEmbed{
-			Title:  cfg.GOOGLE_SHEETS_SPREADSHEET_TAB + " | Team lineups",
-			Fields: fields,
-		})
+		s.ChannelMessageSend(channel.ID, multilineStr.Format())
 	} else {
 		log.Error("Request failed.", slog.Int("HTTP response status code", resp.StatusCode), "request URI", resp.Request.URL.String())
 	}
