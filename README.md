@@ -2,13 +2,13 @@
 A helper tool for tournaments management.
 
 ### Screenshot examples
-Team lineups Discord message | Team lineups Google Spreadsheet
-:-:|:-:
-![Team lineups Discord message example](/assets/team-lineups-example.png) | ![Team lineups Google Spreadsheet example](/assets/google-spreadsheets-example.png)
+`!cup edition 1` | `!cup teams` | Google Spreadsheet UI
+:-:|:-:|:-:
+![!cup edition 1 command example](/assets/cup-edition-1-command-example.png)|![!cup teams command example](/assets/cup-teams-command-example.png)|![Google Spreadsheet example](/assets/google-spreadsheets-example.png)
 
 ### Bot keywords
 ```
-!cup edition <number> | e <number>
+!cup edition <number> | e <num>
 !cup help | h
 !cup teams | t
 (TODO) !cup team <letter>
