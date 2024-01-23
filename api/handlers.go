@@ -72,22 +72,24 @@ func (s *Server) getTeamLineupsByEditionID(w http.ResponseWriter, r *http.Reques
 	w.Write(jsonData)
 }
 
-func (s *Server) SnippetView(w http.ResponseWriter, r *http.Request) {
+func (s *Server) getTeamLineupByDefaultEditionByTeamIDLetter(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil || id < 1 {
+	id := r.URL.Query().Get("id")
+	if id == "" {
 		http.NotFound(w, r)
 		return
 	}
 
-	query := s.config.GOOGLE_SHEETS_SPREADSHEET_TAB + s.config.GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE
-
-	resp, err := googlesheets.SheetsService.Spreadsheets.Values.Get(s.config.GOOGLE_SHEETS_SPREADSHEET_ID, query).MajorDimension("COLUMNS").Do()
+	resp, err :=
+		googlesheets.SheetsService.Spreadsheets.Values.Get(
+			s.config.GOOGLE_SHEETS_SPREADSHEET_ID,
+			s.config.GOOGLE_SHEETS_SPREADSHEET_TAB+fmt.Sprintf("!%s1:%s7", id, id),
+		).MajorDimension("COLUMNS").Do()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -100,5 +102,9 @@ func (s *Server) SnippetView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	if string(jsonData) == "null" {
+		s.logger.Info("Failed to find a team by ID letter.", "value", id)
+		return
+	}
 	w.Write(jsonData)
 }

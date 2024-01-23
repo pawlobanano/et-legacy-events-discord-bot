@@ -28,7 +28,7 @@ func (s *Server) Start() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/cup", s.getTeamLineupsByDefaultEdition)
 	mux.HandleFunc("/cup/edition", s.getTeamLineupsByEditionID)
-	// mux.HandleFunc("/cup/team", s.getTeamLineupOfSetEditionByTeamID)
+	mux.HandleFunc("/cup/team", s.getTeamLineupByDefaultEditionByTeamIDLetter)
 
 	return http.ListenAndServe(s.listenAddr, mux)
 }

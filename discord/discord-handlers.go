@@ -57,6 +57,31 @@ func getTeamLineupsByEditionID(log *slog.Logger, cfg *types.Environemnt, s *disc
 	return createDiscordBotMultilineMessage(cfg, data, edition, log).format()
 }
 
+func getTeamLineupByDefaultEditionByTeamIDLetter(log *slog.Logger, cfg *types.Environemnt, s *discordgo.Session, m *discordgo.MessageCreate, tID string) (outputMessage string) {
+	resp, err := http.DefaultClient.Get("http://" + cfg.SERVER_ADDRESS + "/cup/team?id=" + tID)
+	if err != nil {
+		log.Error(fmt.Sprintf("GET http://%s/cup/team?id=%s failed", cfg.SERVER_ADDRESS, tID), err.Error(), slog.Int("HTTP status code", http.StatusInternalServerError))
+		return
+	}
+	defer resp.Body.Close()
+
+	jsonData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("Failed to read the response body.", err)
+	}
+
+	if string(jsonData) == "" { // Failed to find a team by ID letter. Logged by API handler.
+		return
+	}
+
+	var data types.GSheetsJSONResponse
+	if err := json.Unmarshal(jsonData, &data); err != nil {
+		log.Error("Can not unmarshal JSON.", err)
+	}
+
+	return createDiscordBotMultilineMessage(cfg, data, cfg.GOOGLE_SHEETS_SPREADSHEET_TAB, log).format()
+}
+
 func createDiscordBotMultilineMessage(cfg *types.Environemnt, data types.GSheetsJSONResponse, edition string, log *slog.Logger) *multilineString {
 	multilineStr := newMultilineString("# " + edition + " | Team lineups")
 	for _, row := range data {
@@ -79,7 +104,7 @@ func createDiscordBotMultilineMessage(cfg *types.Environemnt, data types.GSheets
 		}
 		multilineStr.append("")
 	}
-	multilineStr.append("`!cup help` _to check available commands_")
+	multilineStr.append("`!cup help` _for available commands_")
 
 	return multilineStr
 }

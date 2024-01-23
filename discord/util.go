@@ -25,7 +25,7 @@ func (ms *multilineString) append(lines ...string) {
 	ms.Lines = append(ms.Lines, lines...)
 }
 
-// extractSuffixNumber extracts suffix number in a string and return it as integer.
+// extractSuffixNumber extracts suffix number in a string and return it as an integer.
 func extractSuffixNumber(input string) (int, error) {
 	// Split the input string by spaces.
 	parts := strings.Fields(input)
@@ -43,4 +43,16 @@ func extractSuffixNumber(input string) (int, error) {
 	}
 
 	return 0, nil
+}
+
+// extractSuffixLetter extracts suffix letter in a string and return it.
+func extractSuffixLetter(input string) string {
+	// Split the input string by spaces.
+	parts := strings.Fields(input)
+
+	if len(parts) >= 3 {
+		return parts[2]
+	}
+
+	return ""
 }

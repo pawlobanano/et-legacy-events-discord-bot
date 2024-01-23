@@ -1,4 +1,4 @@
-## ET: Legacy Events Discord bot
+## Wolfenstein: Enemy Territory Legacy Events Discord bot
 A helper tool for tournaments management.
 
 ### Screenshot examples
@@ -6,12 +6,12 @@ A helper tool for tournaments management.
 :-:|:-:|:-:
 ![!cup edition 1 command example](/assets/cup-edition-1-command-example.png)|![!cup teams command example](/assets/cup-teams-command-example.png)|![Google Sheets example](/assets/google-sheets-example.png)
 
-### Bot keywords
+### Bot commands
 ```
 !cup edition <number> | e <num>
 !cup help | h
-!cup teams | t
-(TODO) !cup team <letter>
+!cup team <letter> | t <let>
+!cup teams | ts
 !cupbot status | s
 ```
 

@@ -14,6 +14,8 @@ import (
 
 var DiscordSession *discordgo.Session
 
+const cupHelpCmdOutput = "`!cup edition <number> | e <num>`\n`!cup help | h`\n`!cup team <letter> | t <let>`\n`!cup teams | ts`\n"
+
 func Run(log *slog.Logger, cfg *types.Environemnt) {
 	DiscordSession, err := discordgo.New("Bot " + cfg.DISCORD_BOT_API_KEY)
 	if err != nil {
@@ -31,27 +33,40 @@ func Run(log *slog.Logger, cfg *types.Environemnt) {
 			log.Error(err.Error())
 		}
 
+		// The order of checking m.Content in terms of commands is important.
 		if strings.EqualFold(m.Content, "!cup help") || strings.EqualFold(m.Content, "!cup h") {
-			s.ChannelMessageSend(channel.ID, types.DiscordMessage{Message: "`!cup help | h`\n`!cup teams | t`\n`!cup edition <number> | e <num>`"}.Message)
+			s.ChannelMessageSend(channel.ID, types.DiscordMessage{Message: cupHelpCmdOutput}.Message)
+			return
+		}
+
+		if strings.EqualFold(m.Content, "!cup teams") || strings.EqualFold(m.Content, "!cup ts") {
+			s.ChannelMessageSend(
+				m.ChannelID,
+				types.DiscordMessage{Message: getTeamLineupsByDefaultEdition(log, cfg, s, m)}.Message)
+			return
+		}
+
+		if strings.HasPrefix(m.Content, "!cup team") || strings.HasPrefix(m.Content, "!cup t") {
+			tID := extractSuffixLetter(m.Content)
+			if tID == "" {
+				log.Info(fmt.Sprintf("Extracting '%s' command failed.", m.Content), "value", tID)
+				return
+			}
+			s.ChannelMessageSend(
+				m.ChannelID,
+				types.DiscordMessage{Message: getTeamLineupByDefaultEditionByTeamIDLetter(log, cfg, s, m, tID)}.Message)
 			return
 		}
 
 		if strings.HasPrefix(m.Content, "!cup edition") || strings.HasPrefix(m.Content, "!cup e") {
 			eID, err := extractSuffixNumber(m.Content)
 			if err != nil || eID == 0 {
-				log.Error(fmt.Sprintf("Extracting %s command failed.", m.Content), "error", err, "number", eID)
+				log.Error(fmt.Sprintf("Extracting '%s' command failed.", m.Content), "error", err, "value", eID)
 				return
 			}
 			s.ChannelMessageSend(
 				m.ChannelID,
 				types.DiscordMessage{Message: getTeamLineupsByEditionID(log, cfg, s, m, eID)}.Message)
-			return
-		}
-
-		if strings.EqualFold(m.Content, "!cup teams") || strings.EqualFold(m.Content, "!cup t") {
-			s.ChannelMessageSend(
-				m.ChannelID,
-				types.DiscordMessage{Message: getTeamLineupsByDefaultEdition(log, cfg, s, m)}.Message)
 			return
 		}
 
