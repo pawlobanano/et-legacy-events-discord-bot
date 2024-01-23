@@ -1,6 +1,13 @@
-package config
+package types
 
-import "golang.org/x/oauth2/jwt"
+import (
+	"golang.org/x/oauth2/jwt"
+)
+
+// DiscordMessage struct is used for Discord bot API messages.
+type DiscordMessage struct {
+	Message string
+}
 
 // Environemnt is a struct which encapsulates .env file variables.
 type Environemnt struct {
@@ -9,8 +16,9 @@ type Environemnt struct {
 	GOOGLE_SHEETS_SPREADSHEET_ID                 string
 	GOOGLE_SHEETS_SPREADSHEET_TAB                string
 	GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE string
+	SERVER_ADDRESS                               string
 	JwtConfig                                    *jwt.Config
 }
 
-// Response is a type of HTTP response body.
-type Response [][]string
+// GSheetsJSONResponse is a type of Google Sheets API JSON response body.
+type GSheetsJSONResponse [][]string

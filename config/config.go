@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/sheets/v4"
@@ -17,7 +18,7 @@ var (
 )
 
 // LoadConfig loads the configuration from the .env file.
-func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
+func LoadConfig(log *slog.Logger, envFilePath string) (*types.Environemnt, error) {
 	err := Load(envFilePath)
 	if err != nil {
 		log.Error("Loading the .env file failed.", err)
@@ -28,13 +29,14 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*Environemnt, error) {
 		os.Exit(1)
 	}
 
-	envConfig := &Environemnt{
+	envConfig := &types.Environemnt{
 		DISCORD_BOT_API_KEY:                          os.Getenv("DISCORD_BOT_API_KEY"),
 		ENVIRONMENT:                                  os.Getenv("ENVIRONMENT"),
 		GOOGLE_SHEETS_SPREADSHEET_ID:                 os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
 		GOOGLE_SHEETS_SPREADSHEET_TAB:                os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TAB"),
 		GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE"),
-		JwtConfig: loadGoogleKeyJSON(),
+		SERVER_ADDRESS:                               os.Getenv("SERVER_ADDRESS"),
+		JwtConfig:                                    loadGoogleKeyJSON(),
 	}
 
 	return envConfig, nil
@@ -56,6 +58,9 @@ func validateEnvironmentVariables(log *slog.Logger) error {
 		return err
 	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE")) == 0 {
 		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE has not been set.")
+		return err
+	} else if len(os.Getenv("SERVER_ADDRESS")) == 0 {
+		log.Error("Environment variable SERVER_ADDRESS has not been set.")
 		return err
 	}
 
@@ -86,5 +91,6 @@ func Load(envFile string) error {
 		log.Error("Loading the godotenv library failed.", err)
 		return err
 	}
+
 	return nil
 }

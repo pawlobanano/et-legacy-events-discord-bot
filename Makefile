@@ -1,5 +1,8 @@
-run:
-	go run main.go
+build:
+	go build -o bin/et-legacy-events-discord-bot
 
-binary:
-	go build -o et-legacy-events-discord-bot main.go
+run: build
+	./bin/et-legacy-events-discord-bot
+
+vet:
+	go vet ./...
