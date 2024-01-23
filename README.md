@@ -2,9 +2,9 @@
 A helper tool for tournaments management.
 
 ### Screenshot examples
-`!cup edition 1` | `!cup team <letter>` | `!cup teams` | Google Sheets UI
+`!cup edition 1` | `!cup team e` | `!cup teams` | Google Sheets UI
 :-:|:-:|:-:|:-:
-![!cup edition 1 command example](/assets/cup-edition-1-command-example.png)|![!cup team <letter> command example](/assets/cup-team-letter-command-example.png)|![!cup teams command example](/assets/cup-teams-command-example.png)|![Google Sheets example](/assets/google-sheets-example.png)
+![!cup edition 1 command example](/assets/cup-edition-1-command-example.png)|![!cup team e command example](/assets/cup-team-e-command-example.png)|![!cup teams command example](/assets/cup-teams-command-example.png)|![Google Sheets example](/assets/google-sheets-example.png)
 
 ### Bot commands
 ```
