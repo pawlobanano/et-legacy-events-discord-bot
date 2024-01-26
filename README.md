@@ -14,6 +14,7 @@ A helper tool for tournaments management.
 !cup teams | ts
 !cupbot status | s
 ```
+_*All require an admin role and privately messaging the bot._
 
 ### Run bot
 ```sh
