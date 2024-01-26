@@ -2,6 +2,7 @@ package googlesheets
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
@@ -18,5 +19,26 @@ func Run(log *slog.Logger, cfg *types.Environemnt) (err error) {
 		return err
 	}
 
+	cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST = GetAdmins(log, cfg)
+
 	return nil
+}
+
+func GetAdmins(log *slog.Logger, cfg *types.Environemnt) string {
+	resp, err :=
+		SheetsService.Spreadsheets.Values.Get(
+			cfg.GOOGLE_SHEETS_SPREADSHEET_ID,
+			cfg.GOOGLE_SHEETS_SPREADSHEET_TAB+cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL,
+		).Do()
+	if err != nil {
+		log.Error(fmt.Sprintf("Retriving admin list cell '%s' from Google Sheet Tab '%s' failed.", cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL, cfg.GOOGLE_SHEETS_SPREADSHEET_TAB))
+		return ""
+	}
+
+	if len(resp.Values) == 0 {
+		log.Info(fmt.Sprintf("Retriving admin list cell '%s' from Google Sheet Tab '%s' returned no data.", cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL, cfg.GOOGLE_SHEETS_SPREADSHEET_TAB))
+		return ""
+	}
+
+	return fmt.Sprintf("%s", resp.Values[0][0])
 }

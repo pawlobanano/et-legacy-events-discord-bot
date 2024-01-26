@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
 	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
 )
 
@@ -30,10 +31,10 @@ func Run(log *slog.Logger, cfg *types.Environemnt) {
 
 		ch, err := s.UserChannelCreate(m.Author.ID)
 		if err != nil {
-			log.Error(err.Error())
+			log.Error("Failed to run 'func (*discordgo.Session).UserChannelCreate(recipientID string)'.", err)
 		}
 
-		if m.GuildID == "" { // It's a private message
+		if m.GuildID == "" && isAdmin(log, cfg, m) { // It's a private message and the user is admin.
 			// The order of checking m.Content in terms of commands is important.
 			if isCmdCupHelp(m) {
 				s.ChannelMessageSend(ch.ID, types.DiscordMessage{Message: cupHelpCmdOutput}.Message)
@@ -81,6 +82,17 @@ func Run(log *slog.Logger, cfg *types.Environemnt) {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
+}
+
+func isAdmin(log *slog.Logger, cfg *types.Environemnt, m *discordgo.MessageCreate) bool {
+	cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST = googlesheets.GetAdmins(log, cfg)
+
+	if isAdmin := strings.Contains(cfg.GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST, m.Author.String()); !isAdmin {
+		log.Info(fmt.Sprintf("Command '%s' triggered by non-admin user '%s'.", m.Content, m.Author.String()))
+		return false
+	}
+
+	return true
 }
 
 func isCmdCupHelp(m *discordgo.MessageCreate) bool {

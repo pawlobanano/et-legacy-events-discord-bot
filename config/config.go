@@ -32,6 +32,8 @@ func LoadConfig(log *slog.Logger, envFilePath string) (*types.Environemnt, error
 	envConfig := &types.Environemnt{
 		DISCORD_BOT_API_KEY:                          os.Getenv("DISCORD_BOT_API_KEY"),
 		ENVIRONMENT:                                  os.Getenv("ENVIRONMENT"),
+		GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST:         "",
+		GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL:    os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL"),
 		GOOGLE_SHEETS_SPREADSHEET_ID:                 os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID"),
 		GOOGLE_SHEETS_SPREADSHEET_TAB:                os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TAB"),
 		GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE: os.Getenv("GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE"),
@@ -49,6 +51,9 @@ func validateEnvironmentVariables(log *slog.Logger) error {
 		return err
 	} else if len(os.Getenv("ENVIRONMENT")) == 0 {
 		log.Error("Environment variable ENVIRONMENT has not been set.")
+		return err
+	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL")) == 0 {
+		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL has not been set.")
 		return err
 	} else if len(os.Getenv("GOOGLE_SHEETS_SPREADSHEET_ID")) == 0 {
 		log.Error("Environment variable GOOGLE_SHEETS_SPREADSHEET_ID has not been set.")

@@ -13,6 +13,8 @@ type DiscordMessage struct {
 type Environemnt struct {
 	DISCORD_BOT_API_KEY                          string
 	ENVIRONMENT                                  string
+	GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST         string
+	GOOGLE_SHEETS_SPREADSHEET_ADMIN_LIST_CELL    string
 	GOOGLE_SHEETS_SPREADSHEET_ID                 string
 	GOOGLE_SHEETS_SPREADSHEET_TAB                string
 	GOOGLE_SHEETS_SPREADSHEET_TEAM_LINEUPS_RANGE string

@@ -14,7 +14,7 @@ A helper tool for tournaments management.
 !cup teams | ts
 !cupbot status | s
 ```
-_*All require an admin role and privately messaging the bot._
+_*All commands require an admin role and privately messaging the bot. List of admins is read from one of the Google Sheet cells._
 
 ### Run bot
 ```sh
