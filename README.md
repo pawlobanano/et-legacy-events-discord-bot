@@ -32,3 +32,4 @@ make run
 4. [Go formatting - Google standard](https://google.github.io/styleguide/go/decisions)
 5. [Go routing - research, examples, benchmarks](https://benhoyt.com/writings/go-routing)
 6. [Go ServerMux and Handlers](https://www.alexedwards.net/blog/an-introduction-to-handlers-and-servemuxes-in-go)
+7. [Responsive Tournament Bracket - Codepen](https://codepen.io/jimmyhayek/pen/yJZdEB)
