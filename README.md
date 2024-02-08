@@ -10,6 +10,8 @@ A helper tool for tournaments management.
 ```
 !cup edition <number> | e <num>
 !cup help | h
+!cup playthrough | !cup p
+!cup play quarterfinals | !cup play q | !cup p q
 !cup team <letter> | t <let>
 !cup teams | ts
 !cupbot status | s
