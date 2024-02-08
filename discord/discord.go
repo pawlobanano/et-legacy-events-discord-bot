@@ -15,7 +15,7 @@ import (
 
 var DiscordSession *discordgo.Session
 
-const cupHelpCmdOutput = "`!cup edition <number> | e <num>`\n`!cup help | h`\n`!cup team <letter> | t <let>`\n`!cup teams | ts`\n"
+const cupHelpCmdOutput = "_ _\n`!cup edition <number> | e <num>`\n`!cup help | h`\n`!cup team <letter> | t <let>`\n`!cup teams | ts`\n"
 
 func Run(log *slog.Logger, cfg *types.Environemnt) {
 	DiscordSession, err := discordgo.New("Bot " + cfg.DISCORD_BOT_API_KEY)
