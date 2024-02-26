@@ -9,8 +9,8 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
+	"github.com/pawlobanano/tournament-discord-bot/googlesheets"
+	"github.com/pawlobanano/tournament-discord-bot/types"
 )
 
 var DiscordSession *discordgo.Session
@@ -52,6 +52,14 @@ func Run(log *slog.Logger, cfg *types.Environemnt) {
 				s.ChannelMessageSend(
 					m.ChannelID,
 					types.DiscordMessage{Message: getTeamLineupByDefaultEditionByTeamIDLetter(log, cfg, s, m, tID)}.Message)
+				return
+			}
+
+			// TODO: finish implementation
+			if isCmdCupPlaythrough(log, s, m, ch) {
+				s.ChannelMessageSend(
+					m.ChannelID,
+					types.DiscordMessage{Message: getPlaythroughByDefaultEdition(log, cfg, s, m)}.Message)
 				return
 			}
 
@@ -119,6 +127,13 @@ func isCmdCupTeamID(log *slog.Logger, s *discordgo.Session, m *discordgo.Message
 		return true, tID
 	}
 	return false, ""
+}
+
+func isCmdCupPlaythrough(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCreate, ch *discordgo.Channel) bool {
+	if strings.HasPrefix(m.Content, "!cup playthrough") || strings.HasPrefix(m.Content, "!cup p") {
+		return true
+	}
+	return false
 }
 
 func isCmdCupEditionID(log *slog.Logger, s *discordgo.Session, m *discordgo.MessageCreate, ch *discordgo.Channel) (bool, int) {

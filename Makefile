@@ -1,8 +1,8 @@
 build:
-	go build -o bin/et-legacy-events-discord-bot
+	go build -o bin/tournament-discord-bot
 
 run: build
-	./bin/et-legacy-events-discord-bot
+	./bin/tournament-discord-bot
 
 vet:
 	go vet ./...

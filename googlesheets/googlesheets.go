@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
+	"github.com/pawlobanano/tournament-discord-bot/types"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )

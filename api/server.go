@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
+	"github.com/pawlobanano/tournament-discord-bot/types"
 )
 
 // Server struct sets a type used by http package to run HTTP server.
@@ -35,6 +35,7 @@ func (s *Server) Start() error {
 	mux.HandleFunc("/", s.serveTemplate)
 	mux.HandleFunc("/cup", s.getTeamLineupsByDefaultEdition)
 	mux.HandleFunc("/cup/edition", s.getTeamLineupsByEditionID)
+	mux.HandleFunc("/cup/playthrough", s.getPlaythroughByDefaultEdition)
 	mux.HandleFunc("/cup/team", s.getTeamLineupByDefaultEditionByTeamIDLetter)
 
 	return http.ListenAndServe(s.listenAddr, mux)

@@ -8,10 +8,10 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/pawlobanano/et-legacy-events-discord-bot/api"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/config"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/discord"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/googlesheets"
+	"github.com/pawlobanano/tournament-discord-bot/api"
+	"github.com/pawlobanano/tournament-discord-bot/config"
+	"github.com/pawlobanano/tournament-discord-bot/discord"
+	"github.com/pawlobanano/tournament-discord-bot/googlesheets"
 )
 
 var (

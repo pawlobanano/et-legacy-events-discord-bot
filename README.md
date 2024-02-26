@@ -1,5 +1,6 @@
-## Wolfenstein: Enemy Territory Legacy Events Discord bot
-A helper tool for tournaments management.
+## Tournament Discord Bot
+A helper tool for tournaments management. With use of the Google Sheets as a database. 
+Inspired by community Draft Cup started on a Discord channel for the game of Wolfenstein: Enemy Territory Legacy.
 
 ### Screenshot examples
 `!cup edition 1` | `!cup team e` | `!cup teams` | Google Sheets UI

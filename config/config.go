@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/pawlobanano/et-legacy-events-discord-bot/types"
+	"github.com/pawlobanano/tournament-discord-bot/types"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/sheets/v4"
